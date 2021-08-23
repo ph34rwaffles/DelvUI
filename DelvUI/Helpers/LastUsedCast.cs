@@ -1,5 +1,4 @@
-﻿using System;
-using Dalamud.Plugin;
+﻿using Dalamud.Data;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Data.Files;
 using Lumina.Excel.GeneratedSheets;
@@ -12,29 +11,28 @@ namespace DelvUI.Helpers
         private readonly uint _castId;
         private dynamic _lastUsedAction;
         private readonly ActionType _actionType;
-        private readonly DalamudPluginInterface _pluginInterface;
+        private readonly DataManager _dataManager;
         public string ActionText;
         public TexFile Icon;
 
-        public LastUsedCast(uint castId, ActionType actionType, DalamudPluginInterface pluginInterface)
+        public LastUsedCast(uint castId, ActionType actionType, DataManager dataManager)
         {
             _castId = castId;
             _actionType = actionType;
-            _pluginInterface = pluginInterface;
+            _dataManager = dataManager;
             SetCastProperties();
         }
 
         private void SetCastProperties()
         {
             _lastUsedAction = null;
-            if (_castId == 1)
-            {
+            if (_castId == 1) {
                 ActionText = "Interacting...";
-                Icon = _pluginInterface.Data.GetIcon(0);
+                Icon = _dataManager.GetIcon(0);
                 return;
             }
             ActionText = "Casting";
-            Icon = _pluginInterface.Data.GetIcon(0);
+            Icon = _dataManager.GetIcon(0);
             
             switch (_actionType)
             {
@@ -44,25 +42,25 @@ namespace DelvUI.Helpers
                 case ActionType.PvPAction:
                 case ActionType.CraftAction:
                 case ActionType.Ability:
-                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Action>()?.GetRow(_castId);
+                    _lastUsedAction = _dataManager.GetExcelSheet<Action>()?.GetRow(_castId);
                     ActionText = _lastUsedAction?.Name.ToString();
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    Icon = _dataManager.GetIcon(_lastUsedAction?.Icon ?? 0);
                     break;
                 case ActionType.Mount:
-                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Mount>()?.GetRow(_castId);
+                    _lastUsedAction = _dataManager.GetExcelSheet<Mount>()?.GetRow(_castId);
                     ActionText = _lastUsedAction?.Singular.ToString();
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    Icon = _dataManager.GetIcon(_lastUsedAction?.Icon ?? 0);
                     break;
                 case ActionType.KeyItem:
                 case ActionType.Item:
-                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Item>()?.GetRow(_castId);
-                    ActionText = ActionText.ToString() != "" ? _lastUsedAction?.Name.ToString() : "Using item...";
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    _lastUsedAction = _dataManager.GetExcelSheet<Item>()?.GetRow(_castId);
+                    ActionText = ActionText != "" ? _lastUsedAction?.Name.ToString() : "Using item...";
+                    Icon = _dataManager.GetIcon(_lastUsedAction?.Icon ?? 0);
                     break;
                 case ActionType.Companion:
-                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Companion>()?.GetRow(_castId);
+                    _lastUsedAction = _dataManager.GetExcelSheet<Companion>()?.GetRow(_castId);
                     ActionText = _lastUsedAction?.Singular.ToString();
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    Icon = _dataManager.GetIcon(_lastUsedAction?.Icon ?? 0);
                     break;
                 case ActionType.None:
                 case ActionType.General:
@@ -77,12 +75,12 @@ namespace DelvUI.Helpers
                 case ActionType.Accessory:
                     _lastUsedAction = null;
                     ActionText = "Casting...";
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    Icon = _dataManager.GetIcon(_lastUsedAction?.Icon ?? 0);
                     break;
                 default:
                     _lastUsedAction = null;
                     ActionText = "Casting...";
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    Icon = _dataManager.GetIcon(_lastUsedAction?.Icon ?? 0);
                     break;
             }
         }

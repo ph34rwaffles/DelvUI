@@ -1,5 +1,11 @@
 ﻿using System.Numerics;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Data;
+using Dalamud.Game;
+using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.JobGauge;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.Gui;
 using Dalamud.Plugin;
 using ImGuiNET;
 
@@ -12,7 +18,27 @@ namespace DelvUI.Interface {
         private new static int XOffset => 127;
         private new static int YOffset => 479;
         
-        public GunbreakerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+        public GunbreakerHudWindow(
+            ClientState clientState,
+            DalamudPluginInterface pluginInterface,
+            DataManager dataManager,
+            Framework framework,
+            GameGui gameGui,
+            JobGauges jobGauges,
+            ObjectTable objectTable, 
+            PluginConfiguration pluginConfiguration,
+            TargetManager targetManager
+        ) : base(
+            clientState,
+            pluginInterface,
+            dataManager,
+            framework,
+            gameGui,
+            jobGauges,
+            objectTable,
+            pluginConfiguration,
+            targetManager
+        ) { }
 
         protected override void Draw(bool _) {
             DrawPowderGauge();
@@ -22,7 +48,7 @@ namespace DelvUI.Interface {
         }
 
         private void DrawPowderGauge() {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<GNBGauge>();
+            var gauge = JobGauges.Get<GNBGauge>();
             const uint powderColor = 0xFFFEAD43;
 
             const int xPadding = 2;
@@ -34,7 +60,7 @@ namespace DelvUI.Interface {
 
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            if (gauge.NumAmmo > 0) {
+            if (gauge.Ammo > 0) {
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y), 
                     powderColor, powderColor, powderColor, powderColor
@@ -45,7 +71,7 @@ namespace DelvUI.Interface {
             cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
             
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            if(gauge.NumAmmo > 1) {
+            if(gauge.Ammo > 1) {
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y), 
                     powderColor, powderColor, powderColor, powderColor
